@@ -3,10 +3,13 @@ from aiogram.filters.command import Command
 from aiogram import F, Router
 
 from db import (
-    get_quiz_index, 
-    update_quiz_index,
-    get_quiz_result,
-    update_quiz_result,
+    get_current_quiz_index, 
+    update_current_quiz_index,
+    get_current_quiz_result,
+    update_current_quiz_result,
+    get_previous_quiz_result,
+    update_previous_quiz_result,
+    create_new_quiz,
 )
 from quiz_data import quiz_data
 from keyboards import generate_start_keyboard, generate_options_keyboard
@@ -32,8 +35,7 @@ async def cmd_quiz(message: types.Message):
 async def get_question(message, user_id):
 
     # Получение текущего вопроса из словаря состояний пользователя
-    current_question_index = await get_quiz_index(user_id)
-    correct_index = quiz_data[current_question_index]['correct_option']
+    current_question_index = await get_current_quiz_index(user_id)
     opts = quiz_data[current_question_index]['options']
     kb = generate_options_keyboard(opts)
     await message.answer(f"{quiz_data[current_question_index]['question']}", reply_markup=kb)
@@ -41,10 +43,7 @@ async def get_question(message, user_id):
 
 async def new_quiz(message):
     user_id = message.from_user.id
-    current_question_index = 0
-    quiz_result = 0
-    await update_quiz_index(user_id, current_question_index)
-    await update_quiz_result(user_id, quiz_result)
+    await create_new_quiz(user_id)
     await get_question(message, user_id)
 
 
@@ -58,7 +57,7 @@ async def handle_answer(callback: types.CallbackQuery):
     )
 
     # номер вопроса и номер правильного ответа
-    current_question_index = await get_quiz_index(callback.from_user.id)
+    current_question_index = await get_current_quiz_index(callback.from_user.id)
     correct_option = quiz_data[current_question_index]['correct_option']
     # ответ пользователя и его номер ответа
     user_answer_number = int(callback.data.split('_')[1])
@@ -69,22 +68,24 @@ async def handle_answer(callback: types.CallbackQuery):
     # сравниваю ответ пользователя с правильным
     if user_answer_number == correct_option:
         await callback.message.answer("Верно!")
-        # запрашиваю и обновляю результат викторины
-        quiz_result = await get_quiz_result(callback.from_user.id)
+        # запрашиваю и обновляю результат актуальной викторины
+        quiz_result = await get_current_quiz_result(callback.from_user.id)
         quiz_result += 1
-        await update_quiz_result(callback.from_user.id, quiz_result)
+        await update_current_quiz_result(callback.from_user.id, quiz_result)
     else:
         await callback.message.answer("Неправильно!")
     
     # обновляю номер актуального вопроса
     current_question_index += 1
-    await update_quiz_index(callback.from_user.id, current_question_index)
+    await update_current_quiz_index(callback.from_user.id, current_question_index)
 
     # проверяю на окончание викторины
     if current_question_index < len(quiz_data):
         await get_question(callback.message, callback.from_user.id)
     else:
         # вывожу результат викторины
-        final_quiz_result = await get_quiz_result(callback.from_user.id)
+        final_quiz_result = await get_current_quiz_result(callback.from_user.id)
         await callback.message.answer(
             f"Это был последний вопрос. Квиз завершен!\nВаш счет: {final_quiz_result}")
+        # записываю результат викторины в отдельную таблицу
+        await update_previous_quiz_result(callback.from_user.id, final_quiz_result)
