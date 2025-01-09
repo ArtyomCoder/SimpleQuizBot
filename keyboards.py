@@ -8,7 +8,7 @@ def generate_start_keyboard():
     return builder.as_markup(resize_keyboard=True)
 
 
-def generate_options_keyboard(answer_options, right_answer):
+def generate_options_keyboard(answer_options):
     builder = InlineKeyboardBuilder()
 
     for i in range(len(answer_options)):
