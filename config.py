@@ -1,5 +1,8 @@
-# Замените "YOUR_BOT_TOKEN" на токен, который вы получили от BotFather
-API_TOKEN = 'YOUR_BOT_TOKEN'
+import os
+from dotenv import load_dotenv
 
-# Зададим имя базы данных
-DB_NAME = 'quiz_bot.db'
+# загружаю переменные окружения
+load_dotenv()
+
+API_TOKEN = os.getenv('API_TOKEN')
+DB_NAME = os.getenv('DB_NAME')
