@@ -41,46 +41,28 @@ async def new_quiz(message):
     await get_question(message, user_id)
 
 
-@router.callback_query(F.data == "right_answer")
-async def right_answer(callback: types.CallbackQuery):
-
+@router.callback_query(F.data.startswith('answer_'))
+async def handle_answer(callback: types.CallbackQuery):
     await callback.bot.edit_message_reply_markup(
         chat_id=callback.from_user.id,
         message_id=callback.message.message_id,
         reply_markup=None
     )
 
-    await callback.message.answer("Верно!")
-    current_question_index = await get_quiz_index(callback.from_user.id)
-    # Обновление номера текущего вопроса в базе данных
-    current_question_index += 1
-    await update_quiz_index(callback.from_user.id, current_question_index)
-
-
-    if current_question_index < len(quiz_data):
-        await get_question(callback.message, callback.from_user.id)
-    else:
-        await callback.message.answer("Это был последний вопрос. Квиз завершен!")
-
-
-@router.callback_query(F.data == "wrong_answer")
-async def wrong_answer(callback: types.CallbackQuery):
-    await callback.bot.edit_message_reply_markup(
-        chat_id=callback.from_user.id,
-        message_id=callback.message.message_id,
-        reply_markup=None
-    )
-
-    # Получение текущего вопроса из словаря состояний пользователя
     current_question_index = await get_quiz_index(callback.from_user.id)
     correct_option = quiz_data[current_question_index]['correct_option']
 
-    await callback.message.answer(f"Неправильно. Правильный ответ: {quiz_data[current_question_index]['options'][correct_option]}")
+    user_answer_number = int(callback.data.split('_')[1])
+    user_answer = quiz_data[current_question_index]['options'][user_answer_number]
+    await callback.message.answer(f'Ваш ответ: {user_answer}')
 
-    # Обновление номера текущего вопроса в базе данных
+    if user_answer == correct_option:
+        await callback.message.answer("Верно!")
+    else:
+        await callback.message.answer("Неправильно!")
+    
     current_question_index += 1
     await update_quiz_index(callback.from_user.id, current_question_index)
-
 
     if current_question_index < len(quiz_data):
         await get_question(callback.message, callback.from_user.id)

@@ -11,10 +11,10 @@ def generate_start_keyboard():
 def generate_options_keyboard(answer_options, right_answer):
     builder = InlineKeyboardBuilder()
 
-    for option in answer_options:
+    for i in range(len(answer_options)):
         builder.add(types.InlineKeyboardButton(
-            text=option,
-            callback_data="right_answer" if option == right_answer else "wrong_answer")
+            text=answer_options[i],
+            callback_data=f"answer_{i}")
         )
 
     builder.adjust(1)
