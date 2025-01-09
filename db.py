@@ -67,7 +67,7 @@ async def update_previous_quiz_result(user_id, result):
     # Подключаемся к базе данных
     async with aiosqlite.connect(DB_NAME) as db:
         # Получаем запись для заданного пользователя
-        await db.execute('UPDATE quiz_result SET previous_result = (?) WHERE user_id = (?)', (result, user_id))
+        await db.execute('INSERT OR REPLACE INTO quiz_result (user_id, previous_result) VALUES (?, ?)', (user_id, result))
         # Сохраняем изменения
         await db.commit()
 

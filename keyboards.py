@@ -4,7 +4,9 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 def generate_start_keyboard():
     builder = ReplyKeyboardBuilder()
-    builder.add(types.KeyboardButton(text="Начать игру"))
+    builder.add(types.KeyboardButton(text="Начать игру"),
+                types.KeyboardButton(text="Прошлый результат"))
+
     return builder.as_markup(resize_keyboard=True)
 
 

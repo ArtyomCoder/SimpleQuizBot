@@ -27,13 +27,19 @@ async def cmd_start(message: types.Message):
 @router.message(F.text=="Начать игру")
 @router.message(Command("quiz"))
 async def cmd_quiz(message: types.Message):
-
     await message.answer(f"Давайте начнем квиз!")
     await new_quiz(message)
 
 
-async def get_question(message, user_id):
+# Хэндлер на команду /result
+@router.message(F.text=="Прошлый результат")
+@router.message(Command("result"))
+async def cmd_previous_quiz_result(message: types.Message):
+    previous_result = await get_previous_quiz_result(message.from_user.id)
+    await message.answer(f"Счет прошлой викторины: {previous_result}")
 
+
+async def get_question(message, user_id):
     # Получение текущего вопроса из словаря состояний пользователя
     current_question_index = await get_current_quiz_index(user_id)
     opts = quiz_data[current_question_index]['options']
