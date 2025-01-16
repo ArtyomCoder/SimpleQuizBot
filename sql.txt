@@ -21,7 +21,7 @@ PRIMARY KEY (`question_id`)
 CREATE TABLE `quiz_options` (
 question_id Uint64,
 option_index Uint64,
-option_text String,
+option_text Utf8,
 PRIMARY KEY (`question_id`, `option_index`)
 );
 
@@ -39,7 +39,7 @@ VALUES
 (9, "Какая страна знаменита своими тюльпанами и ветряными мельницами?", 2)
 ;
 
-UPSERT INTO `quiz_options` (question_id, option_index, option_text_text)
+UPSERT INTO `quiz_options` (question_id, option_index, option_text)
 VALUES 
 (0, 0, "Канада"),
 (0, 1, "Россия"),

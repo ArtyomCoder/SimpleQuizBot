@@ -7,7 +7,8 @@ async def get_question(message, user_id):
     current_question_index = await get_current_quiz_index(user_id)
     opts = await get_options(current_question_index)
     kb = generate_options_keyboard(opts)
-    question_text = await get_question_by_id(current_question_index)['question_text']
+    question_data = await get_question_by_id(current_question_index)
+    question_text = question_data["question_text"]
     await message.answer(f"{question_text}", reply_markup=kb)
 
 
@@ -147,11 +148,11 @@ async def get_previous_quiz_result(user_id):
 
 
 # quiz_questions
-async def get_question_by_id(question_id: int):
+async def get_question_by_id(question_id):
     get_question_info = f"""
         DECLARE $question_id AS Uint64;
 
-        SELECT *
+        SELECT question_id, question_text, correct_option
         FROM `quiz_questions`
         WHERE question_id == $question_id;
     """
@@ -167,7 +168,8 @@ async def get_question_count():
     results = execute_select_query(pool, get_question_info)
     return results[0]['count']
 
-async def get_options(question_id: int):
+
+async def get_options(question_id):
     get_options = f"""
         DECLARE $question_id AS Uint64;
 

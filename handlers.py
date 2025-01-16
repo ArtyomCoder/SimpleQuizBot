@@ -53,10 +53,12 @@ async def handle_answer(callback: types.CallbackQuery):
 
     # номер вопроса и номер правильного ответа
     current_question_index = await get_current_quiz_index(callback.from_user.id)
-    correct_option = await get_question_by_id(current_question_index)['correct_option']
+    question_data = await get_question_by_id(current_question_index)
+    correct_option = question_data['correct_option']
     # ответ пользователя и его номер ответа
     user_answer_number = int(callback.data.split('_')[1])
-    user_answer = await get_options(current_question_index)[user_answer_number]
+    options = await get_options(current_question_index)
+    user_answer = options[user_answer_number]
     # печатаю ответ пользователя
     await callback.message.answer(f'Ваш ответ: {user_answer}')
 
@@ -74,8 +76,10 @@ async def handle_answer(callback: types.CallbackQuery):
     current_question_index += 1
     await update_current_quiz_index(callback.from_user.id, current_question_index)
 
+    question_number = await get_question_count()
+
     # проверяю на окончание викторины
-    if current_question_index < await get_question_count():
+    if current_question_index < question_number:
         await get_question(callback.message, callback.from_user.id)
     else:
         # вывожу результат викторины
