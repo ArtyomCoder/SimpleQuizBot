@@ -1,4 +1,4 @@
-from db import pool, execute_select_query, execute_update_query
+from .db import pool, execute_select_query, execute_update_query
 
 
 async def create_new_quiz(user_id):

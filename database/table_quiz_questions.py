@@ -1,4 +1,4 @@
-from db import pool, execute_select_query
+from .db import pool, execute_select_query
 
 
 async def get_by_id(question_id: int):
