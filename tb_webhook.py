@@ -1,11 +1,8 @@
-import os
 from aiogram import Bot, Dispatcher, types
 import handlers
+from config import API_TOKEN
 
 import json
-
-# С помощью библиотеки os мы можем получить доступ к параметрам из шага 13 по их имени
-API_TOKEN = os.getenv("API_TOKEN")
 
 # Создаем объект бота
 bot = Bot(token=API_TOKEN)
