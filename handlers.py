@@ -30,6 +30,8 @@ async def cmd_start(message: types.Message):
 @router.message(F.text=="Начать игру")
 @router.message(Command("quiz"))
 async def cmd_quiz(message: types.Message):
+    image_from_url = types.URLInputFile("https://storage.yandexcloud.net/simple-quiz-bot-storage/quiz-cover.jpg")
+    await message.answer_photo(image_from_url)
     await message.answer(f"Давайте начнем квиз!")
     await new_quiz(message)
 
